@@ -1,0 +1,31 @@
+# Игнорировать временные файлы
+*~
+*.swp
+
+# Игнорировать файлы логов
+*.log
+
+# Игнорировать директории
+node_modules/
+dist/
+vendor/
+
+# Игнорировать файлы конфигурации
+.env
+.env.template
+config.js
+docker-compose.yml
+goldenLike.db
+logs.log
+Users
+bot
+
+# Игнорировать файлы изображений и видео
+*.png
+*.jpg
+*.gif
+*.mp4
+
+# Игнорировать файлы архивов
+*.zip
+*.rar
