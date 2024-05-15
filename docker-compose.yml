@@ -1,16 +1,35 @@
-version: '3'
+#version: '3'
+#
+#services:
+#  bot:
+#    build: .
+#    volumes:
+#      - ./bot:/main
+#    environment:
+#      - TELEGRAM_BOT_TOKEN=7066888930:AAHrp16h-XlnYpVfS244TSn_x5dcgDk0Iog
+##    depends_on:
+##      - db
+##
+##  db:
+##    image: sqlite:latest
+##    volumes:
+##      - ./data:/data
+
+version: '3.9'
 
 services:
-  bot:
+  telegram-bot:
     build: .
     volumes:
-      - ./bot:/main
+      - ./Users/levstremilov/Downloads/bot_golden_like:/app
     environment:
-      - TELEGRAM_BOT_TOKEN=7066888930:AAHrp16h-XlnYpVfS244TSn_x5dcgDk0Iog
-#    depends_on:
-#      - db
+      TELEGRAM_TOKEN: 7066888930:AAHrp16h-XlnYpVfS244TSn_x5dcgDk0Iog
+    depends_on:
+      - sqlite-db
 
-#  db:
-#    image: sqlite:latest
-#    volumes:
-#      - ./data:/data
+  sqlite-db:
+    image: tiangolo/uwsgi-nginx-flask:python3.9
+    volumes:
+      - .//Users/levstremilov/Downloads/bot_golden_like/goldenLike.db:/app/db
+    environment:
+      SQLITE_DATABASE_URI: sqlite:///db/goldenLike.db
