@@ -1,7 +1,6 @@
-from aiogram import types, F
+from aiogram import types
 from aiogram.filters import CommandStart
-from aiogram.filters.state import State, StatesGroup
-from loader import dp, bot
+from loader import dp
 import yaml
 
 
