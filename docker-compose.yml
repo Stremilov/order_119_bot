@@ -4,9 +4,11 @@ services:
   telegram-bot:
     build: .
     volumes:
-      - ./Users/levstremilov/Downloads/bot_golden_like:/app
+      - /Users/levstremilov/Downloads/bot_golden_like:/app
     environment:
       TELEGRAM_TOKEN: 7066888930:AAHrp16h-XlnYpVfS244TSn_x5dcgDk0Iog
+    env_file:
+      - .env
     depends_on:
       - sqlite-db
 
