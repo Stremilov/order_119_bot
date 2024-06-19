@@ -25,3 +25,5 @@ class BookTime(Base):
     startBook = Column(Time, nullable=False)
     endBook = Column(Time, nullable=False)
     renter = Column(String, nullable=False)
+
+

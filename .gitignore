@@ -29,3 +29,6 @@ bot
 # Игнорировать файлы архивов
 *.zip
 *.rar
+
+.idea
+.gitignore

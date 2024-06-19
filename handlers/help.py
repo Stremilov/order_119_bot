@@ -10,8 +10,8 @@ async def show_help(message: types.Message):
     commands_list = (
         "Доступные команды:\n"
         "\n"
-        "/start - <b>Начать</b>\n"
         "/help - <b>Получить помощь</b>\n"
-        "/book - <b>Забронировать аудиторию</b>"
+        "/book - <b>Забронировать аудиторию</b>\n"
+        "/schedule - <b>Расписание брони</b>"
     )
     await message.answer(commands_list, parse_mode='html')

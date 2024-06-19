@@ -1,1 +1,1 @@
-from . import (start, help, book)
+from . import (start, help, book, schedule)
