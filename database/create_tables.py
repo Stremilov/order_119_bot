@@ -15,15 +15,17 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
+    telegram_id = Column(Integer, nullable=False)
     username = Column(String, nullable=False)
-    role = Column(String, nullable=False, default="user")
+    role = Column(String, default="user")
 
 class BookTime(Base):
     __tablename__ = 'bookTime'
 
     id = Column(Integer, primary_key=True)
-    startBook = Column(Time, nullable=False)
-    endBook = Column(Time, nullable=False)
+    date = Column(String, nullable=False)
+    startTime = Column(String, nullable=False)
+    endTime = Column(String, nullable=False)
     renter = Column(String, nullable=False)
 
 

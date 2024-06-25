@@ -13,4 +13,4 @@ services:
     volumes:
       - .//Users/levstremilov/Downloads/bot_rent_119/orderDatabase.db:/app/db
     environment:
-      SQLITE_DATABASE_URI: sqlite:///db/goldenLike.db
+      SQLITE_DATABASE_URI: sqlite:///db/orderDatabase.db
