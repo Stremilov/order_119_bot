@@ -16,8 +16,9 @@ def main_kb():
 
     builder.add(types.KeyboardButton(text="📌Забронировать"))
     builder.add(types.KeyboardButton(text="📆Расписание"))
+    builder.add(types.KeyboardButton(text="Отменить бронь"))
     builder.adjust(2)
-    return builder.as_markup()
+    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
 
 @dp.message(CommandStart())
 async def msg_start(message: types.Message):

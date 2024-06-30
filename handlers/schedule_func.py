@@ -24,7 +24,7 @@ def more_schedule_kb():
     builder.add(types.KeyboardButton(text="Посмотреть еще"))
     builder.add(types.KeyboardButton(text="📌Забронировать"))
     builder.adjust(1)
-    return builder.as_markup()
+    return builder.as_markup(one_time_kyeboard=True, resize_keyboard=True)
 
 
 def fetch_event_for_date(date: str):
@@ -39,12 +39,14 @@ def fetch_event_for_date(date: str):
 
 
 def generate_schedule_image(date: datetime):
-    width, height = 600, 400
-    background_color = (255, 255, 255)
+    # width, height = 600, 400
+    # background_color = (255, 255, 255)
     text_color = (0, 0, 0)
     font_size = 20
 
-    image = Image.new("RGB", (width, height), background_color)
+    # image = Image.new("RGB", (width, height), background_color)
+
+    image = Image.open("/Users/levstremilov/Downloads/bot_rent_119/images/бронь_120.jpeg").convert("RGBA")
     draw = ImageDraw.Draw(image)
 
     font = ImageFont.truetype(

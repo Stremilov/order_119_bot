@@ -40,6 +40,19 @@ def create_approval_keyboard(ticket_id):
     return keyboard
 
 
+def cancel_book(ticket_id):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Отмнить бронь", callback_data=f"cancel_{ticket_id}"
+                )
+            ],
+        ]
+    )
+    return keyboard
+
+
 class BookForm(StatesGroup):
     askForDate = State()
     askForStartTime = State()
@@ -54,11 +67,13 @@ with open("texts.yml", "r", encoding="utf-8") as file:
 @form_router.message(Command("book"))
 @dp.message(F.text == "📌Забронировать")
 async def book_place(message: types.Message, state: FSMContext):
-    await state.set_state(BookForm.askForDate)
     user = await bot.get_chat_member(chat_id="-1002154658638", user_id=message.from_user.id)
-    if not(user.status.CREATOR or user.status.MEMBER or user.status.ADMINISTRATOR):
+    if user.status == "left":
         await message.answer("Бронировать аудиторию могут только руководители", reply_markup=main_kb())
         return
+
+    await state.set_state(BookForm.askForDate)
+
     builder = ReplyKeyboardBuilder()
     today = datetime.today()
     for i in range(21):
