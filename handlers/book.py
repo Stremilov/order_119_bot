@@ -6,6 +6,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
+from config_data.config import ADMIN_USERNAME
 from database.create_tables import session, BookTime, User
 from handlers.start import main_kb
 from loader import dp, bot
@@ -14,7 +15,7 @@ import yaml
 form_router = Router()
 dp.include_router(form_router)
 
-ADMIN_USERNAME = "stremilovv"
+
 
 
 def get_admin_id():
@@ -45,7 +46,7 @@ def cancel_book(ticket_id):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Отмнить бронь", callback_data=f"cancel_{ticket_id}"
+                    text="Отменить бронь", callback_data=f"cancel_{ticket_id}"
                 )
             ],
         ]
@@ -238,6 +239,7 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
 async def approve_booking(call: types.CallbackQuery):
     ticket_id = int(call.data.split("_")[1])
     ticket = session.query(BookTime).get(ticket_id)
+
     if ticket:
         ticket.status = "approved"
         session.commit()

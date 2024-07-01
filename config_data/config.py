@@ -10,3 +10,5 @@ DEFAULT_COMMANDS = (
     ('help', ''),
 )
 
+ADMIN_USERNAME = "stremilovv"
+
