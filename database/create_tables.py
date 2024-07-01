@@ -26,6 +26,7 @@ class BookTime(Base):
     date = Column(String, nullable=False)
     startTime = Column(String, nullable=False)
     endTime = Column(String, nullable=False)
+    reason = Column(String, nullable=False)
     renter = Column(String, nullable=False)
 
 

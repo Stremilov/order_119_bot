@@ -2,13 +2,13 @@ from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from config_data.config import ADMIN_USERNAME
 from database.create_tables import session, BookTime, User
 from handlers.book import form_router
 from handlers.start import main_kb
+from keyboards.inline.usermode_inline import create_cancel_keyboard
 from loader import dp, bot
 
 
@@ -20,22 +20,6 @@ class UnBookForm(StatesGroup):
     askForDescription = State()
     sendTicket = State()
 
-def create_cancel_keyboard():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="Отклонить заявку", callback_data="cancel_reject"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="Отменить бронь", callback_data="cancel_approve"
-                )
-            ],
-        ]
-    )
-    return keyboard
 
 @form_router.message(Command("unbook"))
 @dp.message(F.text == "Отменить бронь")

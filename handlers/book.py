@@ -2,68 +2,33 @@ from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
 from config_data.config import ADMIN_USERNAME
 from database.create_tables import session, BookTime, User
 from handlers.start import main_kb
+from keyboards.inline.usermode_inline import create_approval_keyboard
 from loader import dp, bot
 import yaml
 
 form_router = Router()
 dp.include_router(form_router)
 
-
-
-
 def get_admin_id():
     user = session.query(User).filter_by(username=ADMIN_USERNAME).first()
     return user.telegram_id if user else None
-
-
-def create_approval_keyboard(ticket_id):
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="Одобрить", callback_data=f"approve_{ticket_id}"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text="Отклонить", callback_data=f"reject_{ticket_id}"
-                )
-            ],
-        ]
-    )
-    return keyboard
-
-
-def cancel_book(ticket_id):
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="Отменить бронь", callback_data=f"cancel_{ticket_id}"
-                )
-            ],
-        ]
-    )
-    return keyboard
 
 
 class BookForm(StatesGroup):
     askForDate = State()
     askForStartTime = State()
     askForEndTime = State()
+    askForReason = State()
     PendingApproval = State()
-
 
 with open("texts.yml", "r", encoding="utf-8") as file:
     txt_messages = yaml.safe_load(file)
-
 
 @form_router.message(Command("book"))
 @dp.message(F.text == "📌Забронировать")
@@ -89,7 +54,6 @@ async def book_place(message: types.Message, state: FSMContext):
     await state.update_data(
         last_user_message=message.message_id, last_bot_message=bot_message.message_id
     )
-
 
 @form_router.message(BookForm.askForDate)
 async def ask_for_date(message: types.Message, state: FSMContext):
@@ -128,7 +92,6 @@ async def ask_for_date(message: types.Message, state: FSMContext):
     await state.update_data(
         last_user_message=message.message_id, last_bot_message=bot_message.message_id, selected_date=selected_date
     )
-
 
 @form_router.message(BookForm.askForStartTime)
 async def ask_for_start_time(message: types.Message, state: FSMContext):
@@ -173,7 +136,6 @@ async def ask_for_start_time(message: types.Message, state: FSMContext):
         last_user_message=message.message_id, last_bot_message=bot_message.message_id
     )
 
-
 @form_router.message(BookForm.askForEndTime)
 async def ask_for_end_time(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -183,8 +145,6 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
 
     start_time = user_data.get("start_time")
     end_time = message.text
-    start_datetime = f"{start_time}"
-    end_datetime = f"{end_time}"
 
     start_hour, start_minute = map(int, start_time.split(":"))
     end_hour, end_minute = map(int, end_time.split(":"))
@@ -204,11 +164,35 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
         await message.answer("Выбранное время перекрывается с существующей бронью. Пожалуйста, выберите другое время.")
         return
 
+    await bot.delete_message(chat_id=message.chat.id, message_id=last_user_message_id)
+    await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_message_id)
+    await state.update_data(end_time=end_time)
+    await state.set_state(BookForm.askForReason)
+
+    bot_message = await message.answer(
+        "Пожалуйста, укажите причину для бронирования",
+        reply_markup=types.ReplyKeyboardRemove()
+    )
+    await state.update_data(
+        last_user_message=message.message_id, last_bot_message=bot_message.message_id
+    )
+
+@form_router.message(BookForm.askForReason)
+async def ask_for_reason(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    last_user_message_id = user_data.get("last_user_message")
+    last_bot_message_id = user_data.get("last_bot_message")
+    selected_date = user_data.get("selected_date")
+    start_time = user_data.get("start_time")
+    end_time = user_data.get("end_time")
+    reason = message.text
+
     new_ticket = BookTime(
         date=selected_date,
-        startTime=start_datetime,
-        endTime=end_datetime,
+        startTime=start_time,
+        endTime=end_time,
         renter=message.from_user.username,
+        reason=reason
     )
     session.add(new_ticket)
     session.commit()
@@ -221,19 +205,18 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
         keyboard = create_approval_keyboard(new_ticket.id)
         await bot.send_message(
             admin_id,
-            f"Новая заявка:\n\nДата: {new_ticket.date}\nВремя: {new_ticket.startTime}-{new_ticket.endTime}\nАвтор заявки: @{new_ticket.renter}",
+            f"Новая заявка:\n\nДата: {new_ticket.date}\nВремя: {new_ticket.startTime}-{new_ticket.endTime}\nАвтор заявки: @{new_ticket.renter}\nПричина: {new_ticket.reason}",
             reply_markup=keyboard,
+            parse_mode="html",
+        )
+        await message.answer(
+            f"<b>Заявка отправлена</b>\n\nНачало: {new_ticket.startTime}\nКонец: {new_ticket.endTime}\nПричина: {new_ticket.reason}",
             parse_mode="html",
         )
     else:
         await message.answer("Не удалось найти администратора для отправки заявки")
 
-    await message.answer(
-        f"<b>Заявка отправлена</b>\n\nНачало: {new_ticket.startTime}\nКонец: {new_ticket.endTime}",
-        parse_mode="html",
-    )
     await state.set_state(BookForm.PendingApproval)
-
 
 @dp.callback_query(lambda call: call.data.startswith("approve_"))
 async def approve_booking(call: types.CallbackQuery):
@@ -244,18 +227,17 @@ async def approve_booking(call: types.CallbackQuery):
         ticket.status = "approved"
         session.commit()
         await call.message.edit_text(
-            f"Бронь одобрена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nАвтор заявки: @{ticket.renter}"
+            f"Бронь одобрена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}\nАвтор заявки: @{ticket.renter}"
         )
         user = session.query(User).filter_by(username=ticket.renter).first()
         if user:
             await bot.send_message(
                 user.telegram_id,
-                f"<b>Ваша бронь одобрена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}",
+                f"<b>Ваша бронь одобрена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}",
                 parse_mode="html",
             )
     else:
         await call.message.edit_text("Ошибка: бронь не найдена")
-
 
 @dp.callback_query(lambda call: call.data.startswith("reject_"))
 async def reject_booking(call: types.CallbackQuery):
@@ -266,13 +248,13 @@ async def reject_booking(call: types.CallbackQuery):
         session.delete(ticket)
         session.commit()
         await call.message.edit_text(
-            f"Бронь отклонена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nАвтор заявки: @{ticket.renter}"
+            f"Бронь отклонена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}\nАвтор заявки: @{ticket.renter}"
         )
         user = session.query(User).filter_by(username=ticket.renter).first()
         if user:
             await bot.send_message(
                 user.telegram_id,
-                f"<b>Ваша бронь отклонена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}",
+                f"<b>Ваша бронь отклонена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}",
                 parse_mode="html",
             )
     else:
