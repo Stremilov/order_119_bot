@@ -1,8 +1,6 @@
-from aiogram import types, F
-from aiogram.filters import CommandStart, Command
-from aiogram.filters.state import State, StatesGroup
-from loader import dp, bot
-import yaml
+from aiogram import types
+from aiogram.filters import Command
+from loader import dp
 
 
 @dp.message(Command('help'))

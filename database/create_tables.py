@@ -19,8 +19,9 @@ class User(Base):
     username = Column(String, nullable=False)
     role = Column(String, default="user")
 
+
 class BookTime(Base):
-    __tablename__ = 'bookTime'
+    __tablename__ = "bookTime"
 
     id = Column(Integer, primary_key=True)
     date = Column(String, nullable=False)
@@ -28,5 +29,3 @@ class BookTime(Base):
     endTime = Column(String, nullable=False)
     reason = Column(String, nullable=False)
     renter = Column(String, nullable=False)
-
-

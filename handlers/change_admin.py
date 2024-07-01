@@ -4,9 +4,8 @@ from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from handlers.book import form_router
 from handlers.start import main_kb
-from loader import dp
+from loader import dp, form_router
 
 import json
 

@@ -1,19 +1,21 @@
-from aiogram import types, Router, F
+from aiogram import types, F
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
-from config_data.config import ADMIN_USERNAME
 from database.create_tables import session, BookTime, User
+from handlers.change_admin import load_config
 from handlers.start import main_kb
 from keyboards.inline.usermode_inline import create_approval_keyboard
-from loader import dp, bot
+from loader import dp, bot, form_router
 import yaml
 
-form_router = Router()
-dp.include_router(form_router)
+
+
+config = load_config()
+ADMIN_USERNAME = config["ADMIN_USERNAME"]
 
 def get_admin_id():
     user = session.query(User).filter_by(username=ADMIN_USERNAME).first()
@@ -27,15 +29,21 @@ class BookForm(StatesGroup):
     askForReason = State()
     PendingApproval = State()
 
+
 with open("texts.yml", "r", encoding="utf-8") as file:
     txt_messages = yaml.safe_load(file)
+
 
 @form_router.message(Command("book"))
 @dp.message(F.text == "📌Забронировать")
 async def book_place(message: types.Message, state: FSMContext):
-    user = await bot.get_chat_member(chat_id="-1002154658638", user_id=message.from_user.id)
+    user = await bot.get_chat_member(
+        chat_id="-1002154658638", user_id=message.from_user.id
+    )
     if user.status == "left":
-        await message.answer("Бронировать аудиторию могут только руководители", reply_markup=main_kb())
+        await message.answer(
+            "Бронировать аудиторию могут только руководители", reply_markup=main_kb()
+        )
         return
 
     await state.set_state(BookForm.askForDate)
@@ -54,6 +62,7 @@ async def book_place(message: types.Message, state: FSMContext):
     await state.update_data(
         last_user_message=message.message_id, last_bot_message=bot_message.message_id
     )
+
 
 @form_router.message(BookForm.askForDate)
 async def ask_for_date(message: types.Message, state: FSMContext):
@@ -90,8 +99,11 @@ async def ask_for_date(message: types.Message, state: FSMContext):
     await bot.delete_message(chat_id=message.chat.id, message_id=last_user_message_id)
     await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_message_id)
     await state.update_data(
-        last_user_message=message.message_id, last_bot_message=bot_message.message_id, selected_date=selected_date
+        last_user_message=message.message_id,
+        last_bot_message=bot_message.message_id,
+        selected_date=selected_date,
     )
+
 
 @form_router.message(BookForm.askForStartTime)
 async def ask_for_start_time(message: types.Message, state: FSMContext):
@@ -113,7 +125,9 @@ async def ask_for_start_time(message: types.Message, state: FSMContext):
         end_in_minutes = end_hour * 60 + end_minute
         booked_intervals.append((start_in_minutes, end_in_minutes))
 
-    start_hour, start_minute = map(int, start_time.split(":")) if ":" in start_time else (int(start_time), 0)
+    start_hour, start_minute = (
+        map(int, start_time.split(":")) if ":" in start_time else (int(start_time), 0)
+    )
 
     builder = ReplyKeyboardBuilder()
     for hour in range(start_hour, 23):
@@ -135,6 +149,7 @@ async def ask_for_start_time(message: types.Message, state: FSMContext):
     await state.update_data(
         last_user_message=message.message_id, last_bot_message=bot_message.message_id
     )
+
 
 @form_router.message(BookForm.askForEndTime)
 async def ask_for_end_time(message: types.Message, state: FSMContext):
@@ -160,8 +175,13 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
         b_end_in_minutes = b_end_hour * 60 + b_end_minute
         booked_intervals.append((b_start_in_minutes, b_end_in_minutes))
 
-    if any((start_in_minutes < end and end_in_minutes > start) for start, end in booked_intervals):
-        await message.answer("Выбранное время перекрывается с существующей бронью. Пожалуйста, выберите другое время.")
+    if any(
+        (start_in_minutes < end and end_in_minutes > start)
+        for start, end in booked_intervals
+    ):
+        await message.answer(
+            "Выбранное время перекрывается с существующей бронью. Пожалуйста, выберите другое время."
+        )
         return
 
     await bot.delete_message(chat_id=message.chat.id, message_id=last_user_message_id)
@@ -171,11 +191,12 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
 
     bot_message = await message.answer(
         "Пожалуйста, укажите причину для бронирования",
-        reply_markup=types.ReplyKeyboardRemove()
+        reply_markup=types.ReplyKeyboardRemove(),
     )
     await state.update_data(
         last_user_message=message.message_id, last_bot_message=bot_message.message_id
     )
+
 
 @form_router.message(BookForm.askForReason)
 async def ask_for_reason(message: types.Message, state: FSMContext):
@@ -192,7 +213,7 @@ async def ask_for_reason(message: types.Message, state: FSMContext):
         startTime=start_time,
         endTime=end_time,
         renter=message.from_user.username,
-        reason=reason
+        reason=reason,
     )
     session.add(new_ticket)
     session.commit()
@@ -218,6 +239,7 @@ async def ask_for_reason(message: types.Message, state: FSMContext):
 
     await state.set_state(BookForm.PendingApproval)
 
+
 @dp.callback_query(lambda call: call.data.startswith("approve_"))
 async def approve_booking(call: types.CallbackQuery):
     ticket_id = int(call.data.split("_")[1])
@@ -238,6 +260,7 @@ async def approve_booking(call: types.CallbackQuery):
             )
     else:
         await call.message.edit_text("Ошибка: бронь не найдена")
+
 
 @dp.callback_query(lambda call: call.data.startswith("reject_"))
 async def reject_booking(call: types.CallbackQuery):

@@ -4,13 +4,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from config_data.config import ADMIN_USERNAME
 from database.create_tables import session, BookTime, User
-from handlers.book import form_router
+from handlers.change_admin import load_config
 from handlers.start import main_kb
 from keyboards.inline.usermode_inline import create_cancel_keyboard
-from loader import dp, bot
+from loader import dp, bot, form_router
 
+
+config = load_config()
+ADMIN_USERNAME = config["ADMIN_USERNAME"]
 
 def get_admin_id():
     user = session.query(User).filter_by(username=ADMIN_USERNAME).first()

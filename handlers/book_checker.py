@@ -1,6 +1,3 @@
-import schedule
-
-import time
 from datetime import datetime
 from database.create_tables import BookTime, session
 
