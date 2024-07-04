@@ -1,16 +1,13 @@
 import asyncio
 
-import schedule
 from aiogram.types import BotCommand
 
-from handlers.book_checker import delete_past_bookings
 from loader import dp, bot
 from database.create_tables import engine, Base
 import handlers
 
 
 async def main() -> None:
-    schedule.every().day.at("10:00:00").do(delete_past_bookings)
     await bot.set_my_commands(
         [
             BotCommand(command="/start", description="Начать"),
