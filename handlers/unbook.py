@@ -9,11 +9,9 @@ from database.models import User, BookTime
 from handlers.start import main_kb_for_user, main_kb_for_admin
 from keyboards.inline.usermode_inline import create_cancel_keyboard
 from loader import dp, bot, form_router, get_user
+from states.states import UnBookForm
 
 
-class UnBookForm(StatesGroup):
-    askForDescription = State()
-    sendTicket = State()
 
 
 @form_router.message(Command("unbook"))
