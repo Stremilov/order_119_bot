@@ -7,12 +7,14 @@ from datetime import datetime, timedelta
 
 from database.create_tables import session
 from database.models import User, BookTime
+
 # from handlers.change_admin import load_config
 from handlers.start import main_kb_for_user
 from keyboards.inline.usermode_inline import create_approval_keyboard
 from loader import dp, bot, form_router
 import yaml
 
+from states.states import BookForm
 
 
 # config = load_config()
@@ -23,12 +25,7 @@ import yaml
 #     return user.telegram_id if user else None
 
 
-class BookForm(StatesGroup):
-    askForDate = State()
-    askForStartTime = State()
-    askForEndTime = State()
-    askForReason = State()
-    PendingApproval = State()
+
 
 
 with open("texts.yml", "r", encoding="utf-8") as file:
@@ -43,7 +40,8 @@ async def book_place(message: types.Message, state: FSMContext):
     )
     if user.status == "left":
         await message.answer(
-            "Бронировать аудиторию могут только руководители отделов", reply_markup=main_kb_for_user()
+            "Бронировать аудиторию могут только руководители отделов",
+            reply_markup=main_kb_for_user(),
         )
         return
 
