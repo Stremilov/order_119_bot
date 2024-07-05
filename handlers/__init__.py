@@ -1,1 +1,8 @@
-from . import (start, help, book, schedule_func, unbook, change_admin)
+from . import (
+    start,
+    help,
+    book,
+    unbook,
+    # change_admin,
+    schedule_func
+)

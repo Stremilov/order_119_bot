@@ -15,10 +15,6 @@ async def main() -> None:
             BotCommand(command="/book", description="Забронировать аудиторию"),
             BotCommand(command="/unbook", description="Отменить бронь"),
             BotCommand(command="/schedule", description="Расписание бронирования"),
-            BotCommand(
-                command="/change",
-                description="Передать руководство (для главного руководителя)",
-            ),
         ]
     )
     await dp.start_polling(bot)

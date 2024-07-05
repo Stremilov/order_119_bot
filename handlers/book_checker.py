@@ -1,5 +1,6 @@
 from datetime import datetime
-from database.create_tables import BookTime, session
+from database.create_tables import session
+from database.models import BookTime
 
 
 def delete_past_bookings():

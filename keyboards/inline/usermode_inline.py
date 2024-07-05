@@ -23,7 +23,7 @@ def create_cancel_keyboard():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Отклонить заявку", callback_data="cancel_reject"
+                    text="Отклонить", callback_data="cancel_reject"
                 )
             ],
             [
