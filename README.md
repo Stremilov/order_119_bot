@@ -10,24 +10,23 @@
 
 2. **Клонируйте репозиторий:**
    
-   `git clone https://github.com/username/repo-name.git
-   cd repo-name`
+   `git clone https://github.com/username/repo-name.git`
+   `cd repo-name`
    
 3. **Настройте переменные окружения:**
    Создайте файл .env в корневой директории проекта и добавьте следующие строки:
    
-   BOT_TOKEN=your_bot_token_here
-   DATABASE_URL=your_database_url_here
+   `BOT_TOKEN=your_bot_token_here`
+   `DATABASE_URL=your_database_url_here`
    
 4. **Запустите проект:**
    
-   docker-compose up --build
+   `docker-compose up --build`
    
 5. **Остановите проект:**
    Чтобы остановить работающие контейнеры, используйте:
    
-bash
-   docker-compose down
+   `docker-compose down`
    
 ### Запуск без Docker
 
@@ -35,13 +34,11 @@ bash
 
 1. Установите зависимости:
    
-bash
-   pip install -r requirements.txt
+   `pip install -r requirements.txt`
    
 2. Запустите бота:
    
-bash
-   python bot.py
+   `python bot.py`
 
 
 ## 🚀 Описание проекта
