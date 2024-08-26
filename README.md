@@ -10,8 +10,8 @@
 
 2. **Клонируйте репозиторий:**
    
-   git clone https://github.com/username/repo-name.git
-   cd repo-name
+   `git clone https://github.com/username/repo-name.git
+   cd repo-name`
    
 3. **Настройте переменные окружения:**
    Создайте файл .env в корневой директории проекта и добавьте следующие строки:
