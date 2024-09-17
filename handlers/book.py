@@ -1,31 +1,17 @@
 from aiogram import types, F
 from aiogram.filters import Command
-from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
 from database.create_tables import session
-from database.models import User, BookTime
+from database.models import BookTime
 
-# from handlers.change_admin import load_config
 from handlers.start import main_kb_for_user
-from keyboards.inline.usermode_inline import create_approval_keyboard
-from loader import dp, bot, form_router
+from loader import bot, form_router
 import yaml
 
 from states.states import BookForm
-
-
-# config = load_config()
-# ADMIN_USERNAME = config["ADMIN_USERNAME"]
-
-# def get_admin_id():
-#     user = session.query(User).filter_by(username=ADMIN_USERNAME).first()
-#     return user.telegram_id if user else None
-
-
-
 
 
 with open("texts.yml", "r", encoding="utf-8") as file:
@@ -221,52 +207,8 @@ async def ask_for_reason(message: types.Message, state: FSMContext):
     await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_message_id)
 
     await message.answer(
-        f"<b>Новая бронь</b>\n\nДата:{new_ticket.date}\nВремя: {new_ticket.startTime}-{new_ticket.endTime}\nПричина: {new_ticket.reason}",
+        f"<b>Новая бронь</b>\n\n<b>Дата:</b>{new_ticket.date}\n<b>Время:</b> {new_ticket.startTime}-{new_ticket.endTime}\n<b>Причина:</b> {new_ticket.reason}",
         parse_mode="html",
     )
 
     await state.set_state(BookForm.PendingApproval)
-
-
-# @dp.callback_query(lambda call: call.data.startswith("approve_"))
-# async def approve_booking(call: types.CallbackQuery):
-#     ticket_id = int(call.data.split("_")[1])
-#     ticket = session.query(BookTime).get(ticket_id)
-#
-#     if ticket:
-#         ticket.status = "approved"
-#         session.commit()
-#         await call.message.edit_text(
-#             f"Бронь одобрена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}\nАвтор заявки: @{ticket.renter}"
-#         )
-#         user = session.query(User).filter_by(username=ticket.renter).first()
-#         if user:
-#             await bot.send_message(
-#                 user.telegram_id,
-#                 f"<b>Ваша бронь одобрена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}",
-#                 parse_mode="html",
-#             )
-#     else:
-#         await call.message.edit_text("Ошибка: бронь не найдена")
-#
-#
-# @dp.callback_query(lambda call: call.data.startswith("reject_"))
-# async def reject_booking(call: types.CallbackQuery):
-#     ticket_id = int(call.data.split("_")[1])
-#     ticket = session.query(BookTime).get(ticket_id)
-#     if ticket:
-#         ticket.status = "rejected"
-#         session.delete(ticket)
-#         session.commit()
-#         await call.message.edit_text(
-#             f"Бронь отклонена:\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}\nАвтор заявки: @{ticket.renter}"
-#         )
-#         user = session.query(User).filter_by(username=ticket.renter).first()
-#         if user:
-#             await bot.send_message(
-#                 user.telegram_id,
-#                 f"<b>Ваша бронь отклонена</b>\n\nДата: {ticket.date}\nНачало: {ticket.startTime}\nКонец: {ticket.endTime}\nПричина: {ticket.reason}",
-#                 parse_mode="html",
-#             )
-#     else:
-#         await call.message.edit_text("Ошибка: бронь не найдена")

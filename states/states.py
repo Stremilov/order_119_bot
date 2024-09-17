@@ -17,3 +17,7 @@ class BookForm(StatesGroup):
 class UnBookForm(StatesGroup):
     askForDescription = State()
     sendTicket = State()
+
+
+class HistoryForm(StatesGroup):
+    askForDate = State()

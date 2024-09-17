@@ -8,7 +8,7 @@ def main_kb():
 
     builder.add(types.KeyboardButton(text="Забронировать"))
     builder.add(types.KeyboardButton(text="Расписание"))
-    builder.adjust(2)
+    builder.adjust(3)
     return builder.as_markup()
 
 
@@ -22,6 +22,6 @@ def more_schedule_kb_for_admin():
 
 def more_schedule_kb_for_user():
     builder = ReplyKeyboardBuilder()
-    builder.add(types.KeyboardButton(text="Посмотреть еще"))
+    builder.add(types.KeyboardButton(text="Смотреть далее"))
     builder.adjust(1)
     return builder.as_markup(one_time_kyeboard=True, resize_keyboard=True)

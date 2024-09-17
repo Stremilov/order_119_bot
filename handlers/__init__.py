@@ -1,8 +1,1 @@
-from . import (
-    start,
-    help,
-    book,
-    unbook,
-    # change_admin,
-    schedule_func
-)
+from . import start, help, book, unbook, schedule_func, show_history, faq
