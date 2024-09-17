@@ -1,27 +1,17 @@
 from aiogram import types, F
 from aiogram.filters import Command
-from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
 from database import session
-from database.models import User, BookTime
+from database.models import BookTime
 
-# from handlers.change_admin import load_config
 from handlers.start import main_kb_for_user
-from keyboards.inline.usermode_inline import create_approval_keyboard
-from loader import dp, bot, form_router
+from loader import bot, form_router
 import yaml
 
 from states.states import BookForm
-
-# config = load_config()
-# ADMIN_USERNAME = config["ADMIN_USERNAME"]
-
-# def get_admin_id():
-#     user = session.query(User).filter_by(username=ADMIN_USERNAME).first()
-#     return user.telegram_id if user else None
 
 
 with open("texts.yml", "r", encoding="utf-8") as file:
@@ -171,8 +161,8 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
         booked_intervals.append((b_start_in_minutes, b_end_in_minutes))
 
     if any(
-            (start_in_minutes < end and end_in_minutes > start)
-            for start, end in booked_intervals
+        (start_in_minutes < end and end_in_minutes > start)
+        for start, end in booked_intervals
     ):
         await message.answer(
             "Выбранное время перекрывается с существующей бронью. Пожалуйста, выберите другое время."
@@ -217,7 +207,7 @@ async def ask_for_reason(message: types.Message, state: FSMContext):
     await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_message_id)
 
     await message.answer(
-        f"<b>Новая бронь</b>\n\nДата:{new_ticket.date}\nВремя: {new_ticket.startTime}-{new_ticket.endTime}\nПричина: {new_ticket.reason}",
+        f"<b>Новая бронь</b>\n\n<b>Дата:</b>{new_ticket.date}\n<b>Время:</b> {new_ticket.startTime}-{new_ticket.endTime}\n<b>Причина:</b> {new_ticket.reason}",
         parse_mode="html",
     )
 
