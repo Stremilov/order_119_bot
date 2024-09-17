@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from datetime import datetime, timedelta
 
-from database.create_tables import session
+from database import session
 from database.models import User, BookTime
 
 # from handlers.change_admin import load_config

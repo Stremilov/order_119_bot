@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from database.create_tables import session
+from database import session
 from database.models import User, BookTime
 from handlers.start import main_kb_for_user, main_kb_for_admin
 from keyboards.inline.usermode_inline import create_cancel_keyboard

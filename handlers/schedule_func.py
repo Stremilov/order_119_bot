@@ -64,6 +64,6 @@ async def process_date_selection(message: types.Message, state: FSMContext):
     user = await get_user(message)
 
     if user.status == "left":
-        send_image(photo_path, selected_date, more_schedule_kb_for_user, day, message, state)
+        await send_image(photo_path, selected_date, more_schedule_kb_for_user, day, message, state)
     else:
-        send_image(photo_path, selected_date, more_schedule_kb_for_admin, day, message, state)
+        await send_image(photo_path, selected_date, more_schedule_kb_for_admin, day, message, state)

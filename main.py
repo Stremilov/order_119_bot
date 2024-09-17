@@ -3,7 +3,7 @@ import handlers
 
 from aiogram.types import BotCommand
 
-from database.create_tables import Base, engine
+from database import Base, engine
 from loader import bot, dp
 
 

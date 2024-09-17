@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from database.create_tables import session
+from database import session
 from database.models import User
 from keyboards.reply.admin import main_kb_for_admin, main_kb_for_user
 from loader import dp, get_user
