@@ -1,10 +1,10 @@
 import asyncio
+import handlers
 
 from aiogram.types import BotCommand
 
-from loader import dp, bot
-from database.create_tables import engine, Base
-import handlers
+from database.create_tables import Base, engine
+from loader import bot, dp
 
 
 async def main() -> None:
