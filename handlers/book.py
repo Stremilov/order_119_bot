@@ -68,7 +68,7 @@ async def ask_for_date(message: types.Message, state: FSMContext):
         booked_intervals.append((start_in_minutes, end_in_minutes))
 
     builder = ReplyKeyboardBuilder()
-    if datetime.strptime(f'21.09.{datetime.today().year}', '%d.%m.%Y').date() != datetime.today().date():
+    if datetime.strptime(f'{selected_date}.{datetime.today().year}', '%d.%m.%Y').date() != datetime.today().date():
         start_hour = 7
     else:
         start_hour = datetime.now().hour if datetime.now().minute < 31 else datetime.now().hour + 1
