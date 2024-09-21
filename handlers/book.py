@@ -1,18 +1,16 @@
-from aiogram import types, F
+from datetime import datetime, timedelta
+
+import yaml
+from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from datetime import datetime, timedelta
 
-from database import session
-from database.models import BookTime
-
+from database import Session
+from database.repo_booktime import BookTimeRepository
 from handlers.start import main_kb_for_user
 from loader import bot, form_router
-import yaml
-
 from states.states import BookForm
-
 
 with open("texts.yml", "r", encoding="utf-8") as file:
     txt_messages = yaml.safe_load(file)
@@ -59,7 +57,8 @@ async def ask_for_date(message: types.Message, state: FSMContext):
     await state.update_data(selected_date=selected_date)
     await state.set_state(BookForm.askForStartTime)
 
-    booked_times = session.query(BookTime).filter_by(date=selected_date).all()
+    book_repo = BookTimeRepository(Session())
+    booked_times = book_repo.get_bookings_by_date(date=selected_date)
     booked_intervals = []
     for booking in booked_times:
         start_hour, start_minute = map(int, booking.startTime.split(":"))
@@ -101,7 +100,8 @@ async def ask_for_start_time(message: types.Message, state: FSMContext):
     await state.update_data(start_time=start_time)
     await state.set_state(BookForm.askForEndTime)
 
-    booked_times = session.query(BookTime).filter_by(date=selected_date).all()
+    book_repo = BookTimeRepository(Session())
+    booked_times = book_repo.get_bookings_by_date(date=selected_date)
     booked_intervals = []
     for booking in booked_times:
         start_hour, start_minute = map(int, booking.startTime.split(":"))
@@ -151,7 +151,8 @@ async def ask_for_end_time(message: types.Message, state: FSMContext):
     start_in_minutes = start_hour * 60 + start_minute
     end_in_minutes = end_hour * 60 + end_minute
 
-    booked_times = session.query(BookTime).filter_by(date=selected_date).all()
+    book_repo = BookTimeRepository(Session())
+    booked_times = book_repo.get_bookings_by_date(date=selected_date)
     booked_intervals = []
     for booking in booked_times:
         b_start_hour, b_start_minute = map(int, booking.startTime.split(":"))
@@ -193,21 +194,24 @@ async def ask_for_reason(message: types.Message, state: FSMContext):
     end_time = user_data.get("end_time")
     reason = message.text
 
-    new_ticket = BookTime(
+    book_repo = BookTimeRepository(Session())
+    new_ticket = book_repo.create_ticket(
         date=selected_date,
-        startTime=start_time,
-        endTime=end_time,
+        start_time=start_time,
+        end_time=end_time,
         renter=message.from_user.username,
         reason=reason,
     )
-    session.add(new_ticket)
-    session.commit()
 
     await bot.delete_message(chat_id=message.chat.id, message_id=last_user_message_id)
     await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_message_id)
 
     await message.answer(
-        f"<b>Новая бронь</b>\n\n<b>Дата:</b>{new_ticket.date}\n<b>Время:</b> {new_ticket.startTime}-{new_ticket.endTime}\n<b>Причина:</b> {new_ticket.reason}",
+        '\n'.join([
+            '<b>Новая бронь</b>',
+            f'\nДата:{new_ticket.date}',
+            f'Время: {new_ticket.startTime}-{new_ticket.endTime}',
+            f'Причина: {new_ticket.reason}']),
         parse_mode="html",
     )
 

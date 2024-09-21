@@ -1,18 +1,15 @@
 import asyncio
 
-from aiogram.types import BotCommand
-
-from loader import dp, bot
+from database import engine, Base
 from utils.book_checker import delete_past_bookings
 import handlers
 
 from aiogram.types import BotCommand
-
-from database import Base, engine
 from loader import bot, dp
 
 
 async def main() -> None:
+    Base.metadata.create_all(engine)
     delete_past_bookings()
     await bot.set_my_commands(
         [

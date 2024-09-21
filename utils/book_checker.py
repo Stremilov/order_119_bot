@@ -1,5 +1,5 @@
 from datetime import datetime
-from database.create_tables import session
+from database import session
 from database.models import BookTime
 
 

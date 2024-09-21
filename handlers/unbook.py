@@ -9,6 +9,9 @@ from handlers.start import main_kb_for_user, main_kb_for_admin
 from keyboards.inline.usermode_inline import create_cancel_keyboard
 from loader import dp, bot, form_router, get_user
 from states.states import UnBookForm
+from database.repo_booktime import BookTimeRepository
+from database.repo_user import UserRepository
+from database import Session
 
 
 @form_router.message(Command("unbook"))
@@ -24,12 +27,7 @@ async def book_place(message: types.Message, state: FSMContext):
         )
         return
 
-    bookings = (
-        session.query(BookTime)
-        .filter(BookTime.renter == message.from_user.username)
-        .order_by(BookTime.id)
-        .all()
-    )
+    bookings = BookTimeRepository(Session()).get_bookings_by_username(username=message.from_user.username)
     builder = ReplyKeyboardBuilder()
     for booking in bookings:
         builder.add(
@@ -62,18 +60,12 @@ async def approve_booking(call: types.CallbackQuery, state: FSMContext):
 
     await call.message.delete()
 
-    ticket = (
-        session.query(BookTime)
-        .filter(
-            BookTime.date == date.split()[1],
-            BookTime.startTime == date.split()[3],
-            BookTime.endTime == date.split()[5],
-        )
-        .first()
+    ticket = BookTimeRepository(Session()).delete_ticket(
+        date=date.split()[1],
+        start_time=date.split()[3],
+        end_time=date.split()[5]
     )
-    user = session.query(User).filter_by(username=ticket.renter).first()
-    session.delete(ticket)
-    session.commit()
+    user = UserRepository(Session()).get_user_by_username(username=ticket.renter)
     if user:
         await bot.send_message(
             user.telegram_id,
