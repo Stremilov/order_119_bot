@@ -4,7 +4,8 @@ import yaml
 from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+
+from utils.custom_builder import StartReplyBuilder
 
 from database import Session
 from database.repo_booktime import BookTimeRepository
@@ -31,7 +32,7 @@ async def book_place(message: types.Message, state: FSMContext):
 
     await state.set_state(BookForm.askForDate)
 
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     today = datetime.today()
     for i in range(21):
         date_option = today + timedelta(days=i)
@@ -67,7 +68,7 @@ async def ask_for_date(message: types.Message, state: FSMContext):
         end_in_minutes = end_hour * 60 + end_minute
         booked_intervals.append((start_in_minutes, end_in_minutes))
 
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     if datetime.strptime(f'{selected_date}.{datetime.today().year}', '%d.%m.%Y').date() != datetime.today().date():
         start_hour = 7
     else:
@@ -119,7 +120,7 @@ async def ask_for_start_time(message: types.Message, state: FSMContext):
         map(int, start_time.split(":")) if ":" in start_time else (int(start_time), 0)
     )
 
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     for hour in range(start_hour, 23):
         for minute in [0, 30]:
             if hour == start_hour and minute <= start_minute:

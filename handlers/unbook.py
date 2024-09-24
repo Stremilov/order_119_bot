@@ -1,7 +1,7 @@
 from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from utils.custom_builder import StartReplyBuilder
 
 from database import session
 from database.models import User, BookTime
@@ -28,7 +28,7 @@ async def book_place(message: types.Message, state: FSMContext):
         return
 
     bookings = BookTimeRepository(Session()).get_bookings_by_username(username=message.from_user.username)
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     for booking in bookings:
         builder.add(
             types.KeyboardButton(

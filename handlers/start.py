@@ -7,7 +7,6 @@ from keyboards.reply.admin import main_kb_for_admin, main_kb_for_user
 from loader import dp, get_user
 import yaml
 
-
 with open("texts.yml", "r", encoding="utf-8") as file:
     txt_messages = yaml.safe_load(file)
 
