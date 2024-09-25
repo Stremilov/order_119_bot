@@ -3,12 +3,11 @@ from datetime import datetime, timedelta
 from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from utils.custom_builder import StartReplyBuilder
-from loader import bot
 
 from database import Session
-from database.repo_booktime import BookTimeRepository
-from loader import form_router
+from database.repositories.repo_booktime import BookTimeRepository
+from loader import bot, form_router
+from utils.custom_builder import StartReplyBuilder
 
 
 @form_router.message(Command('weekly'))

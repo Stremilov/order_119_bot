@@ -3,14 +3,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from utils.custom_builder import StartReplyBuilder
 
-from database import session
-from database.models import User, BookTime
 from handlers.start import main_kb_for_user, main_kb_for_admin
 from keyboards.inline.usermode_inline import create_cancel_keyboard
 from loader import dp, bot, form_router, get_user
 from states.states import UnBookForm
-from database.repo_booktime import BookTimeRepository
-from database.repo_user import UserRepository
+from database.repositories.repo_booktime import BookTimeRepository
+from database.repositories.repo_user import UserRepository
 from database import Session
 
 

@@ -21,7 +21,7 @@ async def show_help(message: types.Message):
             "/schedule - <b>Расписание брони</b>\n"
             "/change - <b>Изменить руководителя\n</b>"
             "/history - <b>История бронирования</b>\n"
-            "/weekly - <b>Забронированные места за неделю</b>\n"
+            "/weekly - <b>Расписание брони на неделю</b>\n"
             "/faq - <b>Частые вопросы</b>"
         )
         await message.answer(commands_list, parse_mode="html")

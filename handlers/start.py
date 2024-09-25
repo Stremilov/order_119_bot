@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.filters import CommandStart
 
 from database import Session
-from database.repo_user import UserRepository
+from database.repositories.repo_user import UserRepository
 from keyboards.reply.admin import main_kb_for_admin, main_kb_for_user
 from loader import dp, get_user
 import yaml

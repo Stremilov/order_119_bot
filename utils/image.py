@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message, ReplyKeyboardMarkup
 
 from database import Session
-from database.repo_booktime import BookTimeRepository
+from database.repositories.repo_booktime import BookTimeRepository
 
 
 async def generate_schedule_image(date, state: FSMContext):

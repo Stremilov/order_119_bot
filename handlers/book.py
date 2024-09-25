@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from utils.custom_builder import StartReplyBuilder
 
 from database import Session
-from database.repo_booktime import BookTimeRepository
+from database.repositories.repo_booktime import BookTimeRepository
 from handlers.start import main_kb_for_user
 from loader import bot, form_router
 from states.states import BookForm
@@ -21,7 +21,7 @@ with open("texts.yml", "r", encoding="utf-8") as file:
 @form_router.message(F.text == "📌Забронировать")
 async def book_place(message: types.Message, state: FSMContext):
     user = await bot.get_chat_member(
-        chat_id=message.chat.id, user_id=message.from_user.id
+        chat_id="-1002154658638", user_id=message.from_user.id
     )
     if user.status == "left":
         await message.answer(
