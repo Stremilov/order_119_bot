@@ -1,11 +1,12 @@
 import os
 from typing import Callable
-from aiogram.fsm.context import FSMContext
+
 from PIL import Image, ImageDraw, ImageFont
-
-from database.func import fetch_event_for_date
-
+from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message, ReplyKeyboardMarkup
+
+from database import Session
+from database.repositories.repo_booktime import BookTimeRepository
 
 
 async def generate_schedule_image(date, state: FSMContext):
@@ -28,7 +29,7 @@ async def generate_schedule_image(date, state: FSMContext):
 
     day = date.strftime("%d.%m")
     await state.update_data(day=day)
-    data = fetch_event_for_date(day)
+    data = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
     day_of_week = days_translation[date.strftime("%A")]
 
     draw.text((50, 50), f"{day_of_week} {day}", fill=text_color, font=font)
@@ -55,12 +56,12 @@ async def generate_schedule_image(date, state: FSMContext):
 
 
 async def send_image(
-    photo_path,
-    selected_date,
-    keyboard_func: Callable[[], ReplyKeyboardMarkup],
-    day,
-    message: Message,
-    state: FSMContext,
+        photo_path,
+        selected_date,
+        keyboard_func: Callable[[], ReplyKeyboardMarkup],
+        day,
+        message: Message,
+        state: FSMContext,
 ):
     if os.path.exists(photo_path):
         photo = FSInputFile(photo_path)
@@ -69,7 +70,7 @@ async def send_image(
             caption=f"Расписание на {selected_date}",
             reply_markup=keyboard_func(),
         )
-        records = fetch_event_for_date(day)
+        records = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
         for startTime, endTime, reason, renter in records:
             await message.answer(
                 f"Время: {startTime}-{endTime}\nТема: {reason}\nАрендатор: @{renter}"

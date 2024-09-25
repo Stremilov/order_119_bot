@@ -1,14 +1,15 @@
 import asyncio
 
-from aiogram.types import BotCommand
-
-from loader import dp, bot
-from database.create_tables import engine, Base
+from database import engine, Base
 from utils.book_checker import delete_past_bookings
 import handlers
 
+from aiogram.types import BotCommand
+from loader import bot, dp
+
 
 async def main() -> None:
+    Base.metadata.create_all(engine)
     delete_past_bookings()
     await bot.set_my_commands(
         [
@@ -18,7 +19,8 @@ async def main() -> None:
             BotCommand(command="/unbook", description="Отменить бронь"),
             BotCommand(command="/schedule", description="Расписание бронирования"),
             BotCommand(command="/history", description="История бронирования"),
-            BotCommand(command="/faq", description="Часто задаваемые вопросы"),
+            BotCommand(command="/weekly", description="Расписание бронирования на всю неделю"),
+            BotCommand(command="/faq", description="Часто задаваемые вопросы")
         ]
     )
     await dp.start_polling(bot)

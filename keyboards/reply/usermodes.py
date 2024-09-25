@@ -1,10 +1,10 @@
 from aiogram import types
 
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from utils.custom_builder import StartReplyBuilder
 
 
 def main_kb():
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
 
     builder.add(types.KeyboardButton(text="Забронировать"))
     builder.add(types.KeyboardButton(text="Расписание"))
@@ -13,7 +13,7 @@ def main_kb():
 
 
 def more_schedule_kb_for_admin():
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     builder.add(types.KeyboardButton(text="Посмотреть еще"))
     builder.add(types.KeyboardButton(text="📌Забронировать"))
     builder.adjust(1)
@@ -21,7 +21,7 @@ def more_schedule_kb_for_admin():
 
 
 def more_schedule_kb_for_user():
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     builder.add(types.KeyboardButton(text="Смотреть далее"))
     builder.adjust(1)
     return builder.as_markup(one_time_kyeboard=True, resize_keyboard=True)

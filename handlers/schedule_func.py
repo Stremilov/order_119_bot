@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from aiogram import types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from utils.custom_builder import StartReplyBuilder
 from loader import bot, get_user
 from loader import form_router
 
@@ -23,7 +23,7 @@ from keyboards.reply.usermodes import (
 async def schedule_command(message: types.Message, state: FSMContext):
     await state.set_state(ScheduleForm.askForDate)
 
-    builder = ReplyKeyboardBuilder()
+    builder = StartReplyBuilder()
     today = datetime.now()
     for i in range(20):
         date = today + timedelta(days=i)
