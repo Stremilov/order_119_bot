@@ -1,5 +1,6 @@
 from datetime import datetime
-from database.create_tables import BookTime, session
+from database import session
+from database.models import BookTime
 
 
 def delete_past_bookings():
@@ -9,7 +10,9 @@ def delete_past_bookings():
     past_bookings = session.query(BookTime).all()
 
     for booking in past_bookings:
-        booking_date_int = int(booking.date.split(".")[0]) + int(booking.date.split(".")[1]) * 30
+        booking_date_int = (
+            int(booking.date.split(".")[0]) + int(booking.date.split(".")[1]) * 30
+        )
         if booking_date_int < today_date_int:
             session.delete(booking)
 

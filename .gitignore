@@ -32,3 +32,5 @@ bot
 
 .idea
 .gitignore
+
+.venv/
