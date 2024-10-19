@@ -8,6 +8,7 @@ from database import Session
 from database.repositories.repo_booktime import BookTimeRepository
 from loader import bot, form_router
 from utils.custom_builder import StartReplyBuilder
+from utils.weekday_translation import get_weekday_ru
 
 
 @form_router.message(Command('weekly'))
@@ -36,29 +37,24 @@ async def weekly_show(message: types.Message, state: FSMContext):
     builder.add(types.KeyboardButton(text='Следующая неделя'))
     builder.adjust(2)
 
-    days_translation = {
-        "Monday": "Понедельник",
-        "Tuesday": "Вторник",
-        "Wednesday": "Среда",
-        "Thursday": "Четверг",
-        "Friday": "Пятница",
-        "Saturday": "Суббота",
-        "Sunday": "Воскресенье",
-    }
-    msg = ['Расписание на неделю \\(' +
+    msg = ['Расписание на неделю, ' +
            (datetime.today() + timedelta(weeks=week, days=0 - datetime.today().weekday())).strftime("%d\\.%m") + '\\-' +
-           (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d\\.%m") + '\\)\n'
+           (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d\\.%m") + '\n\n'
            ]
 
     for i in range(0, 7):
         day = datetime.today() + timedelta(weeks=week, days=i - datetime.today().weekday())
         records = BookTimeRepository(Session()).get_bookings_by_date(day.strftime('%d.%m'), fetch=True)
         if records:
-            msg.append(f'{days_translation[day.strftime("%A")]}' + r'\(' + day.strftime(r"%d\.%m") + r'\)')
-        for startTime, endTime, reason, renter in records:
-            msg.append(
-                f"```\nВремя: {startTime}-{endTime}\nТема: {reason}\nАрендатор: @{renter}```"
-            )
+            msg.append(f'*{get_weekday_ru(day.strftime("%A"))}' + ', ' + day.strftime("%d\\.%m") + '*\n')
+        for number, item in enumerate(records, 1):
+            start_time, end_time, reason, renter = item
+            msg.append('\n'.join([
+                f"{start_time}\\-{end_time}",
+                f"{number}\\. *{reason}*",
+                f"{'@' + renter : >11}",
+                ''
+            ]))
         if records and i < 6:
             msg.append('')
 
