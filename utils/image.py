@@ -1,5 +1,6 @@
 import os
 from typing import Callable
+from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 from aiogram.fsm.context import FSMContext
@@ -7,20 +8,13 @@ from aiogram.types import FSInputFile, Message, ReplyKeyboardMarkup
 
 from database import Session
 from database.repositories.repo_booktime import BookTimeRepository
+from utils.weekday_translation import get_weekday_ru
 
 
 async def generate_schedule_image(date, state: FSMContext):
     text_color = (0, 0, 0)
     font_size = 32
-    days_translation = {
-        "Monday": "Понедельник",
-        "Tuesday": "Вторник",
-        "Wednesday": "Среда",
-        "Thursday": "Четверг",
-        "Friday": "Пятница",
-        "Saturday": "Суббота",
-        "Sunday": "Воскресенье",
-    }
+
     image = Image.open("handlers/images/бронь_120.jpeg", mode="r").convert("RGB")
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(
@@ -30,7 +24,7 @@ async def generate_schedule_image(date, state: FSMContext):
     day = date.strftime("%d.%m")
     await state.update_data(day=day)
     data = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
-    day_of_week = days_translation[date.strftime("%A")]
+    day_of_week = get_weekday_ru(date.strftime("%A"))
 
     draw.text((50, 50), f"{day_of_week} {day}", fill=text_color, font=font)
     y_offset = 110
@@ -71,10 +65,18 @@ async def send_image(
             reply_markup=keyboard_func(),
         )
         records = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
-        for startTime, endTime, reason, renter in records:
-            await message.answer(
-                f"Время: {startTime}-{endTime}\nТема: {reason}\nАрендатор: @{renter}"
-            )
+
+        formatted_date = selected_date.replace(".", "\\.")
+        weekday_eng = datetime.strptime(selected_date, "%d.%m").strftime('%A')
+        answers = [f'*{get_weekday_ru(weekday_eng)}, {formatted_date}*']
+        for number, item in enumerate(records, 1):
+            start_time, end_time, reason, renter = item
+            answers.append('\n'.join([
+                f"{start_time}\\-{end_time}",
+                f"{number}\\. *{reason}*",
+                f"{'@' + renter : >11}"
+            ]))
+        await message.answer('\n\n'.join(answers), parse_mode='MarkdownV2')
     else:
         await message.answer("Изображение с расписанием не найдено.")
 
