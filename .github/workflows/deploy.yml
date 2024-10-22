@@ -1,0 +1,27 @@
+name: Order_119_Deployment
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_USERNAME: ${{ secrets.DEPLOY_USER }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sshpass
+
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST '
+          cd ~/$SSH_USERNAME/infrastructure/
+          cd order_119_bot
+          git pull
+          docker compose -f docker-compose.yml down || true
+          docker compose -f docker-compose.yml up -d || true
+        '
