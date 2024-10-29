@@ -4,7 +4,7 @@ import yaml
 from aiogram import F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-
+from config_data.config import CHAT_ID
 from utils.custom_builder import StartReplyBuilder
 
 from database import Session
@@ -21,9 +21,10 @@ with open("texts.yml", "r", encoding="utf-8") as file:
 @form_router.message(F.text == "📌Забронировать")
 async def book_place(message: types.Message, state: FSMContext):
     user = await bot.get_chat_member(
-        chat_id="-1002154658638", user_id=message.from_user.id
+        chat_id=CHAT_ID, user_id=message.from_user.id
     )
-    if user.status == "left":
+
+    if user.status in ('left', 'kicked'):
         await message.answer(
             "Бронировать аудиторию могут только руководители отделов",
             reply_markup=main_kb_for_user(),

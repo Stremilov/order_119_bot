@@ -6,7 +6,7 @@ from loader import dp, get_user
 @dp.message(Command("help"))
 async def show_help(message: types.Message):
     user = await get_user(message)
-    if user.status == "left":
+    if user.status in ('left', 'kicked'):
         commands_list = (
             "Доступные команды:\n" "\n" "/schedule - <b>Расписание брони</b>\n"
             "/faq - <b>Частые вопросы</b>"
