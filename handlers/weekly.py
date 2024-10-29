@@ -65,6 +65,7 @@ async def weekly_show(message: types.Message, state: FSMContext):
         await bot.delete_message(chat_id=message.chat.id, message_id=last_user_msg_id)
         await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_msg_id)
 
+    print('\n'.join(msg))
     bot_message = await message.answer(
         '\n'.join(msg),
         reply_markup=builder.as_markup(resize_keyboard=True, one_time_keyboard=True),
