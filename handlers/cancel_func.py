@@ -1,11 +1,17 @@
-from loader import dp
-from handlers.start import msg_start
 from aiogram import F
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
+
+from keyboards.reply.admin import main_kb_for_admin, main_kb_for_user
+from loader import dp, get_user
 
 
 @dp.message(F.text == 'Главное меню')
 async def menu(message: Message, state: FSMContext):
     await state.clear()
-    await msg_start(message)
+    user = await get_user(message)
+
+    if user.status == "left":
+        await message.answer('Главное меню', reply_markup=main_kb_for_user())
+        return
+    await message.answer('Главное меню', reply_markup=main_kb_for_admin())

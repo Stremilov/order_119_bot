@@ -16,7 +16,7 @@ async def msg_start(message: types.Message):
     user_repo = UserRepository(Session())
     user = await get_user(message)
 
-    if user.status == "left":
+    if user.status in ('left', 'kicked'):
         await message.answer(txt_messages["greeting"], reply_markup=main_kb_for_user())
         await message.answer(txt_messages["howToUse"])
         return
