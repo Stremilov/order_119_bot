@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from database import engine, Base
 from utils.book_checker import delete_past_bookings
@@ -9,6 +10,7 @@ from loader import bot, dp
 
 
 async def main() -> None:
+    logging.basicConfig(level=logging.DEBUG, filename="py_log.log", filemode="w")
     Base.metadata.create_all(engine)
     delete_past_bookings()
     await bot.set_my_commands(
