@@ -24,7 +24,8 @@ async def generate_schedule_image(date, state: FSMContext):
     day = date.strftime("%d.%m")
     await state.update_data(day=day)
     data = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
-    day_of_week = get_weekday_ru(date.strftime("%A"))
+    date_weekday = datetime.strptime(f'{day}.{datetime.now().year}', '%d.%m.%Y')
+    day_of_week = get_weekday_ru(date_weekday.strftime("%A"))
 
     draw.text((50, 50), f"{day_of_week} {day}", fill=text_color, font=font)
     y_offset = 110
@@ -67,7 +68,9 @@ async def send_image(
         records = BookTimeRepository(Session()).get_bookings_by_date(day, fetch=True)
 
         formatted_date = selected_date.replace(".", "\\.")
-        weekday_eng = datetime.strptime(selected_date, "%d.%m").strftime('%A')
+        weekday_date = f'{selected_date}.{datetime.now().year}'
+
+        weekday_eng = datetime.strptime(weekday_date, "%d.%m.%Y")
         answers = [f'*{get_weekday_ru(weekday_eng)}, {formatted_date}*']
         for number, item in enumerate(records, 1):
             start_time, end_time, reason, renter = item
