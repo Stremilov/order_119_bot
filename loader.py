@@ -12,6 +12,6 @@ dp.include_router(form_router)
 
 async def get_user(message):
     user = await bot.get_chat_member(
-        chat_id=CHAT_ID, user_id=message.from_user.id
+        chat_id=CHAT_ID, user_id=message.from_user.id, request_timeout=10
     )
     return user
