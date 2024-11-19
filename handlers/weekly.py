@@ -39,8 +39,8 @@ async def weekly_show(message: types.Message, state: FSMContext):
 
     msg = [
         'Расписание на неделю, ' +
-        (datetime.today() + timedelta(weeks=week, days=0 - datetime.today().weekday())).strftime("%d\\.%m") + '\\-' +
-        (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d\\.%m") + '\n\n'
+        (datetime.today() + timedelta(weeks=week, days=0 - datetime.today().weekday())).strftime("%d/%m") + ' \\- ' +
+        (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d/%m") + '\n\n'
     ]
 
     for i in range(0, 7):
@@ -48,16 +48,22 @@ async def weekly_show(message: types.Message, state: FSMContext):
         records = BookTimeRepository(Session()).get_bookings_by_date(day.strftime('%d.%m'), fetch=True)
         if records:
             msg.append(
-                f'*{get_weekday_ru(day.strftime("%A"))}' + ', ' + day.strftime("%d\\.%m").replace('.', '\\.') + '*\n')
+                f"*{get_weekday_ru(day.strftime('%A'))}" + ', ' + day.strftime("%d/%m") + "*\n"
+            )
         for number, item in enumerate(records, 1):
             start_time, end_time, reason, renter = item
 
-            escaped_reason = reason.replace('.', '\\.')
-            escaped_renter = renter.replace('.', '\\.')
+            # Заменяем точки на /
+            formatted_reason = reason.replace('.', '/')
+            formatted_renter = renter.replace('.', '/')
+
+            # Экранируем символы для MarkdownV2
+            escaped_reason = formatted_reason.replace('-', '\\-').replace('_', '\\_').replace('*', '\\*')
+            escaped_renter = formatted_renter.replace('-', '\\-').replace('_', '\\_').replace('*', '\\*')
 
             msg.append('\n'.join([
-                f"{start_time}\\-{end_time}",
-                f"{number}\\. *{escaped_reason}*",
+                f"{start_time}-{end_time}",
+                f"{number}. *{escaped_reason}*",
                 f"{'@' + escaped_renter : >11}",
                 ''
             ]))
