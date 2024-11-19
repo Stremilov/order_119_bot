@@ -37,22 +37,28 @@ async def weekly_show(message: types.Message, state: FSMContext):
     builder.add(types.KeyboardButton(text='Следующая неделя'))
     builder.adjust(2)
 
-    msg = ['Расписание на неделю, ' +
-           (datetime.today() + timedelta(weeks=week, days=0 - datetime.today().weekday())).strftime("%d\\.%m") + '\\-' +
-           (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d\\.%m") + '\n\n'
-           ]
+    msg = [
+        'Расписание на неделю, ' +
+        (datetime.today() + timedelta(weeks=week, days=0 - datetime.today().weekday())).strftime("%d\\.%m") + '\\-' +
+        (datetime.today() + timedelta(weeks=week, days=6 - datetime.today().weekday())).strftime("%d\\.%m") + '\n\n'
+    ]
 
     for i in range(0, 7):
         day = datetime.today() + timedelta(weeks=week, days=i - datetime.today().weekday())
         records = BookTimeRepository(Session()).get_bookings_by_date(day.strftime('%d.%m'), fetch=True)
         if records:
-            msg.append(f'*{get_weekday_ru(day.strftime("%A"))}' + ', ' + day.strftime("%d\\.%m") + '*\n')
+            msg.append(
+                f'*{get_weekday_ru(day.strftime("%A"))}' + ', ' + day.strftime("%d\\.%m").replace('.', '\\.') + '*\n')
         for number, item in enumerate(records, 1):
             start_time, end_time, reason, renter = item
+
+            escaped_reason = reason.replace('.', '\\.')
+            escaped_renter = renter.replace('.', '\\.')
+
             msg.append('\n'.join([
                 f"{start_time}\\-{end_time}",
-                f"{number}\\. *{reason}*",
-                f"{'@' + renter : >11}",
+                f"{number}\\. *{escaped_reason}*",
+                f"{'@' + escaped_renter : >11}",
                 ''
             ]))
         if records and i < 6:
@@ -61,16 +67,15 @@ async def weekly_show(message: types.Message, state: FSMContext):
     if len(msg) == 1:
         msg.append('Пусто')
 
-    if last_bot_msg_id and last_user_msg_id:
-        await bot.delete_message(chat_id=message.chat.id, message_id=last_user_msg_id)
-        await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_msg_id)
-
-    logging.info('\n'.join(msg))
     bot_message = await message.answer(
         '\n'.join(msg),
         reply_markup=builder.as_markup(resize_keyboard=True, one_time_keyboard=True),
         parse_mode='MarkdownV2'
     )
+
+    if last_bot_msg_id and last_user_msg_id:
+        await bot.delete_message(chat_id=message.chat.id, message_id=last_user_msg_id)
+        await bot.delete_message(chat_id=message.chat.id, message_id=last_bot_msg_id)
 
     await state.update_data(
         week=week,
