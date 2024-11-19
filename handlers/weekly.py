@@ -140,7 +140,7 @@ async def weekly_show(message: types.Message, state: FSMContext):
         records = BookTimeRepository(Session()).get_bookings_by_date(day.strftime('%d.%m'), fetch=True)
         if records:
             msg.append(
-                f"{get_weekday_ru(day.strftime('%A'))}" + ', ' + day.strftime("%d/%m") + '\n'
+                f"{get_weekday_ru(day.strftime('%A'))}" + ', ' + day.strftime("%d.%m") + '\n'
             )
         for number, item in enumerate(records, 1):
             start_time, end_time, reason, renter = item
