@@ -4,7 +4,7 @@ services:
   telegram-bot:
     build: .
     depends_on:
-      - db
+      - sqlite-db
     logging:
       driver: loki
       options:
