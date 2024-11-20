@@ -3,10 +3,55 @@ version: '3.9'
 services:
   telegram-bot:
     build: .
-    volumes:
-      - /Users/levstremilov/Downloads/bot_rent_119:/app
     depends_on:
-      - sqlite-db
+      - db
+    logging:
+      driver: loki
+      options:
+        loki-url: http://localhost:3100/loki/api/v1/push
+#    networks:
+#      - connection
+
+#  loki:
+#    hostname: loki
+#    image: grafana/loki:latest
+#    ports:
+#      - "3100:3100"
+#    networks:
+#      - connection
+#    #    command: -config.file=/etc/loki/local-config.yaml
+#    #    volumes:
+#    #      - ./loki-config.yaml:/etc/loki/local-config.yaml
+#
+#  grafana:
+#    hostname: grafana
+#    image: grafana/grafana:latest
+#    environment:
+#      #      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+#      - GF_AUTH_ANONYMOUS_ENABLED=true
+#      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+#      - TZ=${SYSTEM_TIMEZONE:-Europe/Moscow}
+#    #    volumes:
+#    #      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+#    ports:
+#      - "3000:3000"
+#    networks:
+#      - connection
+
+#  db:
+#    image: postgres:latest
+#    restart: always
+#    environment:
+#      POSTGRES_DB: order_119
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    networks:
+#      - connection
+    
 
   sqlite-db:
     image: tiangolo/uwsgi-nginx-flask:python3.9
@@ -14,3 +59,10 @@ services:
       - .//Users/levstremilov/Downloads/bot_rent_119/orderDatabase.db:/app/db
     environment:
       SQLITE_DATABASE_URI: sqlite:///db/orderDatabase.db
+
+#networks:
+#  connection:
+#    driver: bridge
+
+#volumes:
+#  postgres_data:

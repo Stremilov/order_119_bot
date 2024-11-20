@@ -4,4 +4,8 @@
     <option name="sdkName" value="Python 3.12 (119_bot_fixed_fork)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (119_bot_fixed_fork)" project-jdk-type="Python SDK" />
+  <component name="Black">
+    <option name="sdkName" value="Python 3.8 (levstremilov)" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.8 (levstremilov)" project-jdk-type="Python SDK" />
 </project>
