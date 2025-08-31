@@ -5,6 +5,12 @@ services:
     build: .
     depends_on:
       - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=order_119
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
     networks:
       - connection
 
