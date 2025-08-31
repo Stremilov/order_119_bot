@@ -149,7 +149,6 @@ async def weekly_show(message: types.Message, state: FSMContext):
             msg.append('\n'.join([
                 f"{start_time}-{end_time}",
                 f"{number}. {reason}",
-                f"@{renter:>11}",
                 ''
             ]))
         if records and i < 6:
